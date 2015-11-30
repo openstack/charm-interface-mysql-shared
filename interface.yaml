@@ -1,0 +1,3 @@
+name: mysql-shared
+summary: Interface for intergrating with MySQL
+maintainer: OpenStack Charmers <openstack-charmers@lists.ubuntu.com>
