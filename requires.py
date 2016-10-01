@@ -151,3 +151,9 @@ class MySQLSharedRequires(RelationBase):
         if all(data.values()):
             return True
         return False
+
+    def host(self):
+        return self.db_host()
+
+    def user(self, prefix=None):
+        return self.username(prefix)
