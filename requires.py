@@ -1,3 +1,4 @@
+from charmhelpers.core import hookenv
 from charms.reactive import RelationBase
 from charms.reactive import hook
 from charms.reactive import scopes
@@ -31,10 +32,19 @@ class MySQLSharedRequires(RelationBase):
         self.remove_state('{relation_name}.available.access_network')
         self.remove_state('{relation_name}.available.ssl')
 
-    def configure(self, database, username, hostname, prefix=None):
+    def configure(self, database, username, hostname=None, prefix=None):
         """
         Called by charm layer that uses this interface to configure a database.
         """
+        if not hostname:
+            conversation = self.conversation()
+            try:
+                hostname = hookenv.network_get_primary_address(
+                    conversation.relation_name
+                )
+            except NotImplementedError:
+                hostname = hookenv.unit_private_ip()
+
         if prefix:
             relation_info = {
                 prefix + '_database': database,

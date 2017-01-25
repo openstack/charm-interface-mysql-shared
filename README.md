@@ -38,9 +38,8 @@ from charms.reactive import when, when_not
 
 @when('database.connected')
 def setup_database(database):
-    host = unit_get('private-address')
-    database.configure('mydatabase', 'myusername', host, prefix="first")
-    database.configure('mydatabase2', 'myusername2', host, prefix="second")
+    database.configure('mydatabase', 'myusername', prefix="first")
+    database.configure('mydatabase2', 'myusername2', prefix="second")
 
 @when('database.available')
 def use_database(database):
@@ -79,4 +78,16 @@ def waiting_mysql(database):
 @when('database.connected', 'database.available')
 def unit_ready(database):
     status_set('active', 'Unit is ready')
+```
+
+In Juju 2.0 environments, the interface will automatically determine the network
+space binding on the local unit to present to the remote mysql-shared service
+based on the name of the relation.  In older Juju versions, the private-address
+of the unit will be used instead.  This can be overridden using the hostname
+parameter of the configure method.
+
+```python
+@when('database.connected')
+def setup_database(database):
+    database.configure('mydatabase', 'myusername', hostname='hostname.override')
 ```
