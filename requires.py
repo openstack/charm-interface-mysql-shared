@@ -27,10 +27,18 @@ class MySQLSharedRequires(RelationBase):
 
     @hook('{requires:mysql-shared}-relation-{broken,departed}')
     def departed(self):
+        # Clear state
         self.remove_state('{relation_name}.connected')
         self.remove_state('{relation_name}.available')
         self.remove_state('{relation_name}.available.access_network')
         self.remove_state('{relation_name}.available.ssl')
+        # Check if this is the last unit
+        for conversation in self.conversations():
+            for rel_id in conversation.relation_ids:
+                if len(hookenv.related_units(rel_id)) > 0:
+                    # This is not the last unit so reevaluate state
+                    self.joined()
+                    self.changed()
 
     def configure(self, database, username, hostname=None, prefix=None):
         """
