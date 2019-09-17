@@ -1,2 +1,4 @@
 .tox
 .testrepository
+.stestr/
+__pycache__
