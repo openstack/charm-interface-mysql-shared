@@ -91,3 +91,31 @@ parameter of the configure method.
 def setup_database(database):
     database.configure('mydatabase', 'myusername', hostname='hostname.override')
 ```
+
+## Provides
+
+The interface layer will set the following states, as appropriate:
+
+  * `{relation_name}.connected`  The relation is established, but the client
+    has not provided the database information yet.
+  * `{relation_name}.available`  The requested information is complete. The DB,
+    user and hostname can be created.
+  * connection information is passed back to the client with the following method:
+    * `set_db_connection_info()`
+
+For example:
+
+```python
+@reactive.when('leadership.is_leader')
+@reactive.when('leadership.set.cluster-instances-clustered')
+@reactive.when('shared-db.available')
+def shared_db_respond(shared_db):
+    with charm.provide_charm_instance() as instance:
+        instance.create_databases_and_users(shared_db)
+        instance.assess_status()
+```
+
+The interface will automatically determine the network space binding on the
+local unit to present to the remote mysql-shared client based on the name of
+the relation. This can be overridden using the db_host parameter of the
+set_db_connection_info method.
