@@ -10,7 +10,8 @@ class MySQLSharedRequires(RelationBase):
     # These remote data fields will be automatically mapped to accessors
     # with a basic documentation string provided.
     auto_accessors = ['access-network', 'db_host',
-                      'ssl_ca', 'ssl_cert', 'ssl_key']
+                      'ssl_ca', 'ssl_cert', 'ssl_key',
+                      'cluster-series-upgrading']
 
     @hook('{requires:mysql-shared}-relation-joined')
     def joined(self):
@@ -18,12 +19,17 @@ class MySQLSharedRequires(RelationBase):
 
     @hook('{requires:mysql-shared}-relation-changed')
     def changed(self):
-        if self.base_data_complete():
-            self.set_state('{relation_name}.available')
-        if self.access_network_data_complete():
-            self.set_state('{relation_name}.available.access_network')
-        if self.ssl_data_complete():
-            self.set_state('{relation_name}.available.ssl')
+        if self.cluster_series_upgrading() == 'True':
+            self.remove_state('{relation_name}.available')
+            self.remove_state('{relation_name}.available.access_network')
+            self.remove_state('{relation_name}.available.ssl')
+        else:
+            if self.base_data_complete():
+                self.set_state('{relation_name}.available')
+            if self.access_network_data_complete():
+                self.set_state('{relation_name}.available.access_network')
+            if self.ssl_data_complete():
+                self.set_state('{relation_name}.available.ssl')
 
     @hook('{requires:mysql-shared}-relation-{broken,departed}')
     def departed(self):
