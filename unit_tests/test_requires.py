@@ -116,6 +116,7 @@ class TestMySQLSharedRequires(unittest.TestCase):
             self.assertEqual(hook_patterns[k], v['args'])
 
     def test_changed_available(self):
+        self.patch_mysql_shared('unit_allowed_all_dbs', True)
         self.patch_mysql_shared('base_data_complete', True)
         self.patch_mysql_shared('access_network_data_complete', True)
         self.patch_mysql_shared('ssl_data_complete', True)
@@ -258,3 +259,33 @@ class TestMySQLSharedRequires(unittest.TestCase):
         _second = "secondprefix"
         self.mysql_shared.set_prefix(_second)
         self.set_local.assert_called_once_with("prefixes", [_prefix, _second])
+
+    @mock.patch.object(requires.hookenv, 'log')
+    @mock.patch.object(requires.hookenv, 'local_unit')
+    def test_unit_allowed_db(self, local_unit, log):
+        self._remote_data = {'allowed_units': 'unit/1 unit/3'}
+        local_unit.return_value = 'unit/1'
+        self.assertTrue(self.mysql_shared.unit_allowed_db())
+        local_unit.return_value = 'unit/2'
+        self.assertFalse(self.mysql_shared.unit_allowed_db())
+
+    @mock.patch.object(requires.hookenv, 'log')
+    @mock.patch.object(requires.hookenv, 'local_unit')
+    def test_unit_allowed_db_prefix(self, local_unit, log):
+        self._remote_data = {'bob_allowed_units': 'unit/1 unit/3'}
+        local_unit.return_value = 'unit/1'
+        self.assertTrue(self.mysql_shared.unit_allowed_db(prefix='bob'))
+        self.assertFalse(self.mysql_shared.unit_allowed_db())
+        self.assertFalse(self.mysql_shared.unit_allowed_db(prefix='flump'))
+
+    @mock.patch.object(requires.hookenv, 'log')
+    @mock.patch.object(requires.hookenv, 'local_unit')
+    def test_unit_allowed_all_dbs(self, local_unit, log):
+        local_unit.return_value = 'unit/1'
+        self._local_data = {"prefixes": ['prefix1', 'prefix2']}
+        self._remote_data = {'prefix1_allowed_units': 'unit/1 unit/3'}
+        self.assertFalse(self.mysql_shared.unit_allowed_all_dbs())
+        self._remote_data = {
+            'prefix1_allowed_units': 'unit/1 unit/3',
+            'prefix2_allowed_units': 'unit/1 unit/3'}
+        self.assertTrue(self.mysql_shared.unit_allowed_all_dbs())
