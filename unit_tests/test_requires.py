@@ -80,6 +80,7 @@ class TestMySQLSharedRequires(unittest.TestCase):
         self.patch_mysql_shared('set_state')
         self.patch_mysql_shared('remove_state')
         self.patch_mysql_shared('db_host', "10.5.0.21")
+        self.patch_mysql_shared('wait_timeout', 90)
 
     def tearDown(self):
         self.mysql_shared = None
@@ -160,6 +161,16 @@ class TestMySQLSharedRequires(unittest.TestCase):
         assert self.mysql_shared.base_data_complete() is True
         self.db_host.return_value = None
         assert self.mysql_shared.base_data_complete() is False
+
+    def test_shared_db_data_complete_wait_timeout(self):
+        self._local_data = {"prefixes": ["myprefix"]}
+        self._remote_data = {"myprefix_password": "1234",
+                             "myprefix_allowed_units": "unit/1"}
+        # Wait timeout is an optional value and should not affect data complete
+        self.wait_timeout.return_value = None
+        assert self.mysql_shared.base_data_complete() is True
+        self.wait_timeout.return_value = 90
+        assert self.mysql_shared.base_data_complete() is True
 
     def test_base_data_incomplete(self):
         assert self.mysql_shared.base_data_complete() is False

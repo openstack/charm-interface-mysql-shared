@@ -158,3 +158,20 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
             mock.call("{}_password".format(_p), _pw),
             mock.call("{}_allowed_units".format(_p), self.fake_unit.unit_name)]
         self.fake_relation.to_publish_raw.__setitem__.assert_has_calls(_calls)
+
+    def test_set_db_connection_info_wait_timeout(self):
+        _wto = 90
+        _p = "prefix"
+        _pw = "fakepassword"
+        self.ep.set_db_connection_info(
+            self.fake_relation_id,
+            self.ep.ingress_address,
+            _pw,
+            allowed_units=self.fake_unit.unit_name,
+            prefix=_p, wait_timeout=_wto)
+        _calls = [
+            mock.call("db_host", self.ep.ingress_address),
+            mock.call("wait_timeout", _wto),
+            mock.call("{}_password".format(_p), _pw),
+            mock.call("{}_allowed_units".format(_p), self.fake_unit.unit_name)]
+        self.fake_relation.to_publish_raw.__setitem__.assert_has_calls(_calls)

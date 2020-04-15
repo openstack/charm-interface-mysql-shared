@@ -11,7 +11,7 @@ class MySQLSharedRequires(RelationBase):
     # with a basic documentation string provided.
     auto_accessors = ['access-network', 'db_host',
                       'ssl_ca', 'ssl_cert', 'ssl_key',
-                      'cluster-series-upgrading']
+                      'cluster-series-upgrading', 'wait_timeout']
 
     @hook('{requires:mysql-shared}-relation-joined')
     def joined(self):
