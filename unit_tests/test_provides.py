@@ -133,6 +133,7 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
 
     def test_set_db_connection_info_no_prefix(self):
         _pw = "fakepassword"
+        _port = 3306
         self.ep.set_db_connection_info(
             self.fake_relation_id,
             self.ep.ingress_address,
@@ -140,6 +141,23 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
             allowed_units=self.fake_unit.unit_name)
         _calls = [
             mock.call("db_host", self.ep.ingress_address),
+            mock.call("db_port", _port),
+            mock.call("password", _pw),
+            mock.call("allowed_units", self.fake_unit.unit_name)]
+        self.fake_relation.to_publish_raw.__setitem__.assert_has_calls(_calls)
+
+    def test_set_db_connection_w_port(self):
+        _pw = "fakepassword"
+        _port = 3316
+        self.ep.set_db_connection_info(
+            self.fake_relation_id,
+            self.ep.ingress_address,
+            _pw,
+            allowed_units=self.fake_unit.unit_name,
+            db_port=_port)
+        _calls = [
+            mock.call("db_host", self.ep.ingress_address),
+            mock.call("db_port", _port),
             mock.call("password", _pw),
             mock.call("allowed_units", self.fake_unit.unit_name)]
         self.fake_relation.to_publish_raw.__setitem__.assert_has_calls(_calls)
@@ -147,6 +165,7 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
     def test_set_db_connection_info_prefixed(self):
         _p = "prefix"
         _pw = "fakepassword"
+        _port = 3306
         self.ep.set_db_connection_info(
             self.fake_relation_id,
             self.ep.ingress_address,
@@ -155,6 +174,7 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
             prefix=_p)
         _calls = [
             mock.call("db_host", self.ep.ingress_address),
+            mock.call("db_port", _port),
             mock.call("{}_password".format(_p), _pw),
             mock.call("{}_allowed_units".format(_p), self.fake_unit.unit_name)]
         self.fake_relation.to_publish_raw.__setitem__.assert_has_calls(_calls)
@@ -163,6 +183,7 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
         _wto = 90
         _p = "prefix"
         _pw = "fakepassword"
+        _port = 3306
         self.ep.set_db_connection_info(
             self.fake_relation_id,
             self.ep.ingress_address,
@@ -171,6 +192,7 @@ class TestMySQLSharedProvides(test_utils.PatchHelper):
             prefix=_p, wait_timeout=_wto)
         _calls = [
             mock.call("db_host", self.ep.ingress_address),
+            mock.call("db_port", _port),
             mock.call("wait_timeout", _wto),
             mock.call("{}_password".format(_p), _pw),
             mock.call("{}_allowed_units".format(_p), self.fake_unit.unit_name)]

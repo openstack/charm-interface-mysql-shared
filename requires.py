@@ -9,7 +9,7 @@ class MySQLSharedRequires(RelationBase):
 
     # These remote data fields will be automatically mapped to accessors
     # with a basic documentation string provided.
-    auto_accessors = ['access-network', 'db_host',
+    auto_accessors = ['access-network', 'db_host', 'db_port',
                       'ssl_ca', 'ssl_cert', 'ssl_key',
                       'cluster-series-upgrading', 'wait_timeout']
 
