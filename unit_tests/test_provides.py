@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import charms_openstack.test_utils as test_utils
-import mock
+from unittest import mock
 import provides
 
 
