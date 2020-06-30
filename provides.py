@@ -76,7 +76,8 @@ class MySQLSharedProvides(reactive.Endpoint):
 
     def set_db_connection_info(
             self, relation_id, db_host, password,
-            allowed_units=None, prefix=None, wait_timeout=None, db_port=3306):
+            allowed_units=None, prefix=None, wait_timeout=None, db_port=3306,
+            ssl_ca=None):
         # Implementations of shared-db pre-date the json encoded era of
         # interface layers. In order not to have to update dozens of charms,
         # publish in raw data
@@ -87,6 +88,8 @@ class MySQLSharedProvides(reactive.Endpoint):
         if wait_timeout:
             self.relations[relation_id].to_publish_raw["wait_timeout"] = (
                 wait_timeout)
+        if ssl_ca:
+            self.relations[relation_id].to_publish_raw["ssl_ca"] = ssl_ca
         if not prefix:
             self.relations[relation_id].to_publish_raw["password"] = password
             self.relations[relation_id].to_publish_raw[

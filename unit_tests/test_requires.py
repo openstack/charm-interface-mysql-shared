@@ -182,10 +182,11 @@ class TestMySQLSharedRequires(unittest.TestCase):
         assert self.mysql_shared.access_network_data_complete() is False
 
     def test_ssl_data_incomplete(self):
+        self.patch_mysql_shared('ssl_ca', "Certificate Authority")
         self.patch_mysql_shared('ssl_cert', "somecert")
         self.patch_mysql_shared('ssl_key', "somekey")
         assert self.mysql_shared.ssl_data_complete() is True
-        self.ssl_key.return_value = None
+        self.ssl_ca.return_value = None
         assert self.mysql_shared.ssl_data_complete() is False
 
     def test_local_accessors(self):
