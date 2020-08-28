@@ -64,15 +64,21 @@ class MySQLSharedProvides(reactive.Endpoint):
         else:
             reactive.clear_flag(self.expand_name('{endpoint_name}.available'))
 
-    @reactive.when_any('endpoint.{endpoint_name}.broken',
-                       'endpoint.{endpoint_name}.departed')
-    def departed(self):
+    def remove(self):
         flags = (
             self.expand_name('{endpoint_name}.connected'),
             self.expand_name('{endpoint_name}.available'),
         )
         for flag in flags:
             reactive.clear_flag(flag)
+
+    @reactive.when('endpoint.{endpoint_name}.broken')
+    def broken(self):
+        self.remove()
+
+    @reactive.when('endpoint.{endpoint_name}.departed')
+    def departed(self):
+        self.remove()
 
     def set_db_connection_info(
             self, relation_id, db_host, password,

@@ -28,8 +28,9 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
 
                 "changed": (
                     "endpoint.{endpoint_name}.changed",),
-                "departed": ("endpoint.{endpoint_name}.broken",
-                             "endpoint.{endpoint_name}.departed",),
+                "departed": ("endpoint.{endpoint_name}.departed",),
+
+                "broken": ("endpoint.{endpoint_name}.broken",),
             },
         }
         # test that the hooks were registered
